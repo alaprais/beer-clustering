@@ -1,4 +1,4 @@
-###################FinalProject################################
+###################FinalProject#################################
 
 ### Personal Path ##################
 personal_path <- "C:/Users/Arnaud Laprais/Desktop/SJSU/267 computational stats/beer_project/recipeData.csv"
