@@ -94,21 +94,21 @@ sort(table(data$Style), decreasing = TRUE)
 #install.packages("ggplot2")
 
 
-LDAall = lda(data$Style~., data[,c(6:13,15)])
-LDAall #Top 2 LDA variables account for 97.1% of variation
+LDAall = lda(data$Style~., data[,c(2:9)])
+LDAall #Top 2 LDA variables account for 95.4% of variation
 #ggord(linear, train$Stlye)
 LDA1Proportions=abs(LDAall$scaling[,1])/sum(abs(LDAall$scaling[,1]))
 LDA2Proportions=abs(LDAall$scaling[,2])/sum(abs(LDAall$scaling[,2]))
 
-topLDA1=(head(sort(LDA1Proportions,decreasing=TRUE), n = 3)) #top 3 in LDA1 are FG, color, and ABV. accounts for 91.2% of variation
-topLDA2=(head(sort(LDA2Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are ABV and FG. accounts for 94.1% of variation
+topLDA1=(head(sort(LDA1Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG, and FG. accounts for 99.4% of variation
+topLDA2=(head(sort(LDA2Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG and FG. accounts for 98.2% of variation
 
 #from this, we can reduce model to most important variables for separating classes (FG, color, and ABV)
 predictLDA = predict(LDAall)
 
-newdata = data.frame(type = data[,4], lda = predictLDA$x)
-ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5) #can't easily separate 20 groups visually in 2D, but can definitely see some clusters 
-ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5)+xlim(-10,7)+ylim(-5,10) #can't easily separate 20 groups visually in 2D, but can definitely see some clusters 
+newdata = data.frame(type = data[,1], lda = predictLDA$x)
+ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
+#ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5)+xlim(-12,7)+ylim(-10,5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
 
 set.seed(21324)
 trainSample=sample(1:n,ceiling(.8*n))
