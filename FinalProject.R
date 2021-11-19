@@ -221,7 +221,8 @@ sum(predicted_test == true_test)/1734 # accuracy
 
 
 
-
+#below repeats some code from above but i wanted to make sure it uses the right subset.
+#this creates new LD combination columns to be fed into EM
 
 
 pairs <- read.table("pairs_2.txt", header = T)
