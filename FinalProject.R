@@ -173,18 +173,6 @@ indicesTest=c(1:n)[-trainSample]
 test=data[indicesTest,]
 
 #################################### END LDA/ VARIABLE SELECTION ########################################################
-# subset data from highly distinct pairs
-pairs <- read.table("pairs_2.txt", header = T)
-length(unique(pairs$beer_1))  # 58 beers
-high_distinct_beers <- sort(table(pairs$beer_1)[table(pairs$beer_1) >= 30])
-
-length(high_distinct_beers)  # narrowed to 13 highly distinct beers
-high_distinct_beers <- names(high_distinct_beers) # labels for beers
-
-subset_data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
-row.names(subset_data) <- NULL # reset row indices
-
-
 
 
 ################################################################ MODEL-BASED CLASSIFICATION ##################################################################
