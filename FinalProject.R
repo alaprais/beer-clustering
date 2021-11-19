@@ -58,11 +58,12 @@ data <- data[data$Color<100,]
 summary(data)
 
 # Keep 10 styles only
-to_keep <- c("American Pale Ale","Saison","American Amber Ale", "Blonde Ale", 
-             "Irish Red Ale", "Witbier", "Russian Imperial Stout", "Robust Porter",
-             "Kölsch", "Cream Ale")
+# Keep 10 styles only
+# to_keep <- c("American Pale Ale","Saison","American Amber Ale", "Blonde Ale", 
+#              "Irish Red Ale", "Witbier", "Russian Imperial Stout", "Robust Porter",
+#              "Kölsch", "Cream Ale")
 
-data <- data[data$Style %in% to_keep,]
+#data <- data[data$Style %in% to_keep,]
 
 # count of each style in the data
 sort(table(data$Style), decreasing = TRUE) 
@@ -117,4 +118,43 @@ indicesTest=c(1:n)[-trainSample]
 test=data[indicesTest,]
 
 #################################### END LDA/ VARIABLE SELECTION ########################################################
+# subset data from highly distinct pairs
+pairs <- read.table("pairs_2.txt", header = T)
+length(unique(pairs$beer_1))  # 58 beers
+high_distinct_beers <- sort(table(pairs$beer_1)[table(pairs$beer_1) >= 30])
+
+length(high_distinct_beers)  # narrowed to 13 highly distinct beers
+high_distinct_beers <- names(high_distinct_beers) # labels for beers
+
+subset_data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
+row.names(subset_data) <- NULL # reset row indices
+
+
+
+
+########## Model-based classification
+set.seed(8734)
+labels_word <- subset_data$Style # true labels in words
+labels_factor <- as.numeric(factor(subset_data$Style)) # true labels as factor
+
+unique(labels_word)  #sanity check
+unique(labels_factor)
+
+# test set (and train set)
+n <- dim(subset_data)[1]
+testSample <- sample(1:n,ceiling(.2*n))
+true_test <- labels_factor[testSample]
+labels_factor[testSample] <- 0    # artificially erase labels for test set
+
+# checking labels_factor var
+table(labels_factor)
+sum(labels_factor == 0)/length(labels_factor) # should be 20%
+
+# MGHD
+#res_MGHD <- MGHD(data= subset_data[,c("FG","Color", "ABV")], G= 13, label= labels_factor)
+
+predicted_labels <- res_MGHD@map
+predicted_test <- predicted_labels[testSample]
+
+sum(predicted_test == true_test)/1734 # accuracy
 
