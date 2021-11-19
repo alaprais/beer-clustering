@@ -118,7 +118,7 @@ length(high_distinct_beers)  # narrowed to 13 highly distinct beers
 high_distinct_beers <- names(high_distinct_beers) # labels for beers
 
 data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
-row.names(subset_data) <- NULL # reset row indices
+row.names(data) <- NULL # reset row indices
 
 # count of each style in the data
 sort(table(data$Style), decreasing = TRUE) 
@@ -177,6 +177,9 @@ test=data[indicesTest,]
 
 ################################################################ MODEL-BASED CLASSIFICATION ##################################################################
 set.seed(8734)
+subset_data <- data # copy of data for this section
+
+
 labels_word <- subset_data$Style # true labels in words
 labels_factor <- as.numeric(factor(subset_data$Style)) # true labels as factor
 
