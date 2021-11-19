@@ -11,5 +11,5 @@
 * Cleaning
 * Subset to high distinct beers (using all columns)
 * LDA on subsetted data
-* Classifcation of subsetted data (using subsetted data LDA linear combo variables - "LDA1","LDA2"
+* Classifcation of subsetted data (using subsetted data LDA linear combo variables - "LDA1","LDA2")
 * Results:          , easier to visualize
