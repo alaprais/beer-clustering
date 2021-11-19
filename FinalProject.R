@@ -12,6 +12,8 @@ library(psych)
 library(MASS)
 library(devtools)
 library(ggplot2)
+library(mclust)
+library(MixGHD)
 ##################################
 ###################################################### START DATA CLEANING ############################################
 data <- read.csv(personal_path)
