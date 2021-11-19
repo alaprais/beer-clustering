@@ -208,7 +208,7 @@ res_MGHD <- MGHD(data= subset_data[,c("FG","Color", "ABV")], G= 13, label= label
 predicted_labels <- res_MGHD@map
 predicted_test <- predicted_labels[testSample]
 
-sum(predicted_test == true_test)/1734 # accuracy
+sum(predicted_test == true_test)/length(testSample) # accuracy
 
 
 ############################################################## END MODEL-BASED CLASSIFICATION ##################################################################
