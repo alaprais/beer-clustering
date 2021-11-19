@@ -4,7 +4,7 @@
 * Cleaning
 * LDA on full data
 * Subset to high distinct beers (using full_data LDA variables)
-* Classification of subsetted data (using full_data LDA - recommended variables: "FG","ABV","Color")
+* Classification of subsetted data (using full_data LDA - recommended variables: "FG","OG")
 * Results: 40% accuracy, but hard to visualize
 
 ### Approach 2 - FinalProject_Updated.R
