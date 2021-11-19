@@ -60,7 +60,7 @@ data <- data[data$Color<100,]
 
 
 beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]  # keep styles that have over 300 observations (59 styles)
-data <- data[data$Style %in% beers]
+data <- data[data$Style %in% beers,]
 
 summary(data)
 
