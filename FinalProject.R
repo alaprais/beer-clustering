@@ -57,6 +57,11 @@ data <- data[data$IBU<500,]
 # Color is generally between 0 - 40 but can get higher. Like IBU, not sure where we should draw the line (theres only 1 over 100 and it's
 # pretty suspect so removed it).
 data <- data[data$Color<100,]
+
+
+beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]  # keep styles that have over 300 observations (59 styles)
+data <- data[data$Style %in% beers]
+
 summary(data)
 
 #########################################  END DATA CLEANING ###############################################################
@@ -120,7 +125,7 @@ test=data[indicesTest,]
 # pairs <- c("beer_1","beer_2", "difference")
 # beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]
 # i <- 0
-# for (beer_1 in beers[1:63]){ #64 causes error
+# for (beer_1 in beers){ 
 #   for (beer_2 in beers){
 #     print(beer_2)
 #     if (beer_1 == beer_2){
