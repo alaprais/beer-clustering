@@ -167,6 +167,7 @@ ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5) #c
 #ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5)+xlim(-12,7)+ylim(-10,5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
 
 set.seed(21324)
+n <- dim(newdata)[1]
 trainSample=sample(1:n,ceiling(.8*n))
 train=data[sample(1:n,ceiling(.8*n)),]
 indicesTest=c(1:n)[-trainSample]
