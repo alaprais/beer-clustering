@@ -1,10 +1,15 @@
 # beer-clustering project outline
 
-### Data Cleaning
-* Throw out trash
-* Subset to 10-15 styles
-### Variable Selection (LDA)
+### Approach 1
+* Cleaning
+* LDA on full data
+* Subset to high distinct beers (using full_data LDA variables)
+* Classification of subsetted data (using full_data LDA - recommended variables: "FG","ABV","Color")
+* Results: 40% accuracy, but hard to visualize
 
-### Clustering
-* Model Validation (Train/Test)
-* Plots
+### Approach 2
+* Cleaning
+* Subset to high distinct beers (using all columns)
+* LDA on subsetted data
+* Classifcation of subsetted data (using subsetted data LDA linear combo variables - "LDA1","LDA2"
+* Results:          , easier to visualize
