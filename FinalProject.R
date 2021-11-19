@@ -59,7 +59,60 @@ data <- data[data$IBU<500,]
 data <- data[data$Color<100,]
 summary(data)
 
-#########################################################################################
+#########################################  END DATA CLEANING ###############################################################
+
+######################################## START LDA/VARIABLE SELECTION ######################################################
+
+#result <- MclustDA(data[,c(6:12,15)], data[,4], modelType = "EDDA", modelNames = "EEE")
+
+#result=Mclust(data[,c(6:12,15)],3,modelNames = "EDDA") #incorporate N/A cols and categorical later
+#result$loglik #smart starting points so dont need to change start and compare this number to find best start (bigger loglikelihood)
+#result$parameters #pro are proportions (pi_g's) #mean are mu's for each cluster
+
+#var=result$parameters$variance
+#cov2cor(var$sigma[,,2]) #cov matrix for cluster 2
+#labels= result$classification #labels
+#plot(data,col=style)
+
+
+
+
+
+############LDA TRY####################
+#install.packages("klaR")
+#install.packages("psych")
+#install.packages("MASS")
+#install.packages("devtools")
+#install.packages("ggplot2")
+
+
+LDAall = lda(data$Style~., data[,c(2:9)])
+LDAall #Top 2 LDA variables account for 95.4% of variation
+#ggord(linear, train$Stlye)
+LDA1Proportions=abs(LDAall$scaling[,1])/sum(abs(LDAall$scaling[,1]))
+LDA2Proportions=abs(LDAall$scaling[,2])/sum(abs(LDAall$scaling[,2]))
+
+topLDA1=(head(sort(LDA1Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG, and FG. accounts for 99.4% of variation
+topLDA2=(head(sort(LDA2Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG and FG. accounts for 98.2% of variation
+
+#from this, we can reduce model to most important variables for separating classes (FG, color, and ABV)
+predictLDA = predict(LDAall)
+
+newdata = data.frame(type = data[,1], lda = predictLDA$x)
+ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
+#ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5)+xlim(-12,7)+ylim(-10,5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
+
+set.seed(21324)
+n <- dim(newdata)[1]
+trainSample=sample(1:n,ceiling(.8*n))
+train=data[sample(1:n,ceiling(.8*n)),]
+indicesTest=c(1:n)[-trainSample]
+test=data[indicesTest,]
+
+#################################### END LDA/ VARIABLE SELECTION ########################################################
+
+################################### SUBSETTING DATA TO DISTINCT BEERS ##################################################
+# using variables considered high impact by LDA on full dataset
 #### CODE BLOCK OUTPUTS "pairs_2.txt" FILE TO CURRENT DIRECTORY
 #### for loop to check every single relationship and note the distinct ones
 #### only compare between beers with 300 or more observations, otherwise not very meaningful
@@ -124,59 +177,7 @@ row.names(data) <- NULL # reset row indices
 
 # count of each style in the data
 sort(table(data$Style), decreasing = TRUE) 
-
-#########################################  END DATA CLEANING ###############################################################
-
-######################################## START LDA/VARIABLE SELECTION ######################################################
-
-#result <- MclustDA(data[,c(6:12,15)], data[,4], modelType = "EDDA", modelNames = "EEE")
-
-#result=Mclust(data[,c(6:12,15)],3,modelNames = "EDDA") #incorporate N/A cols and categorical later
-#result$loglik #smart starting points so dont need to change start and compare this number to find best start (bigger loglikelihood)
-#result$parameters #pro are proportions (pi_g's) #mean are mu's for each cluster
-
-#var=result$parameters$variance
-#cov2cor(var$sigma[,,2]) #cov matrix for cluster 2
-#labels= result$classification #labels
-#plot(data,col=style)
-
-
-
-
-
-############LDA TRY####################
-#install.packages("klaR")
-#install.packages("psych")
-#install.packages("MASS")
-#install.packages("devtools")
-#install.packages("ggplot2")
-
-
-LDAall = lda(data$Style~., data[,c(2:9)])
-LDAall #Top 2 LDA variables account for 95.4% of variation
-#ggord(linear, train$Stlye)
-LDA1Proportions=abs(LDAall$scaling[,1])/sum(abs(LDAall$scaling[,1]))
-LDA2Proportions=abs(LDAall$scaling[,2])/sum(abs(LDAall$scaling[,2]))
-
-topLDA1=(head(sort(LDA1Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG, and FG. accounts for 99.4% of variation
-topLDA2=(head(sort(LDA2Proportions,decreasing=TRUE), n = 2)) #top 2 in LDA1 are OG and FG. accounts for 98.2% of variation
-
-#from this, we can reduce model to most important variables for separating classes (FG, color, and ABV)
-predictLDA = predict(LDAall)
-
-newdata = data.frame(type = data[,1], lda = predictLDA$x)
-ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
-#ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = type), size = .5)+xlim(-12,7)+ylim(-10,5) #can't easily separate 10 groups visually in 2D, but can definitely see some clusters 
-
-set.seed(21324)
-n <- dim(newdata)[1]
-trainSample=sample(1:n,ceiling(.8*n))
-train=data[sample(1:n,ceiling(.8*n)),]
-indicesTest=c(1:n)[-trainSample]
-test=data[indicesTest,]
-
-#################################### END LDA/ VARIABLE SELECTION ########################################################
-
+################################### END OF SUBSETTING DATA TO DISTINCT BEERS ##################################################
 
 ################################################################ MODEL-BASED CLASSIFICATION ##################################################################
 set.seed(8734)
