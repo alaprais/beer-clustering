@@ -57,13 +57,68 @@ data <- data[data$IBU<500,]
 data <- data[data$Color<100,]
 summary(data)
 
-# Keep 10 styles only
-# Keep 10 styles only
-# to_keep <- c("American Pale Ale","Saison","American Amber Ale", "Blonde Ale", 
-#              "Irish Red Ale", "Witbier", "Russian Imperial Stout", "Robust Porter",
-#              "Kölsch", "Cream Ale")
+#########################################################################################
+#### CODE BLOCK OUTPUTS "pairs_2.txt" FILE TO CURRENT DIRECTORY
+#### for loop to check every single relationship and note the distinct ones
+#### only compare between beers with 300 or more observations, otherwise not very meaningful
 
-#data <- data[data$Style %in% to_keep,]
+# pairs <- c("beer_1","beer_2", "difference")
+# beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]
+# i <- 0
+# for (beer_1 in beers[1:63]){ #64 causes error
+#   for (beer_2 in beers){
+#     print(beer_2)
+#     if (beer_1 == beer_2){
+#       #pass
+#     }
+#     else{
+#       to_keep <- c(beer_1, beer_2) # relationship of interest
+#       cur_data <- data[data$Style %in% to_keep,] # only keep beer_1 and beer_2
+#       
+#       res <- Mclust(cur_data[,c("FG", "Color", "ABV")], G=2) # cluster
+#       
+#       compare <- cbind(cur_data$Style, res$classification)
+#       
+#       # cluster 1 has x % of the totals for each beer
+#       perc_beer_1 <- sum(compare[compare[,2] == 1,][,1] == beer_1)/sum(cur_data$Style == beer_1)
+#       perc_beer_2 <- sum(compare[compare[,2] == 1,][,1] == beer_2)/sum(cur_data$Style == beer_2)
+#       
+#       # cluster 2 has x % of the totals for each beer (redundant since it will be 1-cluster 1)
+#       #perc_beer_1 <- sum(compare[compare[,2] == 2,][,1] == beer_1)/sum(data$Style == beer_1)
+#       #perc_beer_2 <- sum(compare[compare[,2] == 2,][,1] == beer_2)/sum(data$Style == beer_2)
+#       
+#       
+#       #(perc_beer_1 > .9)&(perc_beer_2 < .1) | (perc_beer_2 > .9)&(perc_beer_1 < .1)
+#       if ( abs(perc_beer_2 - perc_beer_1) > .85 ) {
+#         pairs <- rbind(pairs, c(beer_1, beer_2, abs(perc_beer_2 - perc_beer_1)))
+#       }
+#       i <- i + 1
+#       print(paste(paste("pair ", i), "of 3481"))
+#       print(paste(100 - round((i/3481 * 100),0.2), "% remaining"))
+#     }
+#   }
+# }
+# 
+# length(unique(pairs[,1])) # error is ok, since we covered everything
+#                           # also missing a few relationships is fine, since exploratory
+# 
+# # writes pairs to file
+# write.table(pairs, file="pairs_2.txt", row.names=FALSE, col.names=FALSE)
+# 
+# sort(table(pairs[,1]))
+#########################################################################################
+
+# subset data from highly distinct pairs
+# NOTE: HAVE THE "pairs_2.txt" FILE IN THE WORKING DIRECTORY
+pairs <- read.table("pairs_2.txt", header = T)
+length(unique(pairs$beer_1))  # 58 beers
+high_distinct_beers <- sort(table(pairs$beer_1)[table(pairs$beer_1) >= 30])
+
+length(high_distinct_beers)  # narrowed to 13 highly distinct beers
+high_distinct_beers <- names(high_distinct_beers) # labels for beers
+
+data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
+row.names(subset_data) <- NULL # reset row indices
 
 # count of each style in the data
 sort(table(data$Style), decreasing = TRUE) 
@@ -132,7 +187,7 @@ row.names(subset_data) <- NULL # reset row indices
 
 
 
-########## Model-based classification
+################################################################ MODEL-BASED CLASSIFICATION ##################################################################
 set.seed(8734)
 labels_word <- subset_data$Style # true labels in words
 labels_factor <- as.numeric(factor(subset_data$Style)) # true labels as factor
@@ -157,4 +212,7 @@ predicted_labels <- res_MGHD@map
 predicted_test <- predicted_labels[testSample]
 
 sum(predicted_test == true_test)/1734 # accuracy
+
+
+############################################################## END MODEL-BASED CLASSIFICATION ##################################################################
 
