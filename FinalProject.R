@@ -203,7 +203,7 @@ table(labels_factor)
 sum(labels_factor == 0)/length(labels_factor) # should be 20%
 
 # MGHD
-#res_MGHD <- MGHD(data= subset_data[,c("FG","Color", "ABV")], G= 13, label= labels_factor)
+res_MGHD <- MGHD(data= subset_data[,c("FG","Color", "ABV")], G= 13, label= labels_factor)
 
 predicted_labels <- res_MGHD@map
 predicted_test <- predicted_labels[testSample]
