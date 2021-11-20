@@ -121,6 +121,7 @@ test=data[indicesTest,]
 #### CODE BLOCK OUTPUTS "pairs_4.txt" FILE TO CURRENT DIRECTORY
 #### for loop to check every single relationship and note the distinct ones
 #### only compare between beers with 300 or more observations, otherwise not very meaningful
+#### NOTE: TIME CONSUMING - checks (59*59 - 59) mclust models
 
 create_txt_file <- FALSE
 if (create_txt_file == TRUE){
