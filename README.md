@@ -5,7 +5,7 @@
 * LDA on full data
 * Subset to high distinct beers (using all columns)
 * Classification of subsetted data (using full_data LDA - recommended variables: "FG","OG")
-* Results: 73% accuracy on 6 groups, Used: Color, ABV
+* Results: 73% accuracy on 6 groups with 80% missing data, Used: Color, ABV
 
 ### Approach 2 - FinalProject_Updated.R
 * Cleaning
