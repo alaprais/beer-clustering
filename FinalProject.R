@@ -14,6 +14,7 @@ library(devtools)
 library(ggplot2)
 library(mclust)
 library(MixGHD)
+library(caret)
 ##################################
 ###################################################### START DATA CLEANING ############################################
 data <- read.csv(personal_path)
@@ -58,6 +59,8 @@ data <- data[data$IBU<500,]
 # pretty suspect so removed it).
 data <- data[data$Color<100,]
 
+beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]  # keep styles that have over 300 observations (59 styles)
+data <- data[data$Style %in% beers,]
 
 summary(data)
 
@@ -113,65 +116,68 @@ test=data[indicesTest,]
 
 #################################### END LDA/ VARIABLE SELECTION ########################################################
 
-################################### SUBSETTING DATA TO DISTINCT BEERS ##################################################
-# using variables considered high impact by LDA on full dataset
-#### CODE BLOCK OUTPUTS "pairs_2.txt" FILE TO CURRENT DIRECTORY
+
+###################################### BEER STYLE SELECTION ##############################################################
+#### CODE BLOCK OUTPUTS "pairs_4.txt" FILE TO CURRENT DIRECTORY
 #### for loop to check every single relationship and note the distinct ones
 #### only compare between beers with 300 or more observations, otherwise not very meaningful
 
-# pairs <- c("beer_1","beer_2", "difference")
-# beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]
-# i <- 0
-# for (beer_1 in beers){ 
-#   for (beer_2 in beers){
-#     print(beer_2)
-#     if (beer_1 == beer_2){
-#       #pass
-#     }
-#     else{
-#       to_keep <- c(beer_1, beer_2) # relationship of interest
-#       cur_data <- data[data$Style %in% to_keep,] # only keep beer_1 and beer_2
-#       
-#       res <- Mclust(cur_data[,c("FG", "Color", "ABV")], G=2) # cluster
-#       
-#       compare <- cbind(cur_data$Style, res$classification)
-#       
-#       # cluster 1 has x % of the totals for each beer
-#       perc_beer_1 <- sum(compare[compare[,2] == 1,][,1] == beer_1)/sum(cur_data$Style == beer_1)
-#       perc_beer_2 <- sum(compare[compare[,2] == 1,][,1] == beer_2)/sum(cur_data$Style == beer_2)
-#       
-#       # cluster 2 has x % of the totals for each beer (redundant since it will be 1-cluster 1)
-#       #perc_beer_1 <- sum(compare[compare[,2] == 2,][,1] == beer_1)/sum(data$Style == beer_1)
-#       #perc_beer_2 <- sum(compare[compare[,2] == 2,][,1] == beer_2)/sum(data$Style == beer_2)
-#       
-#       
-#       #(perc_beer_1 > .9)&(perc_beer_2 < .1) | (perc_beer_2 > .9)&(perc_beer_1 < .1)
-#       if ( abs(perc_beer_2 - perc_beer_1) > .85 ) {
-#         pairs <- rbind(pairs, c(beer_1, beer_2, abs(perc_beer_2 - perc_beer_1)))
-#       }
-#       i <- i + 1
-#       print(paste(paste("pair ", i), "of 3422"))
-#       print(paste(100 - round((i/3422 * 100),0.2), "% remaining"))
-#     }
-#   }
-# }
-# 
-# length(unique(pairs[,1])) # error is ok, since we covered everything
-#                           # also missing a few relationships is fine, since exploratory
-# 
-# # writes pairs to file
-# write.table(pairs, file="pairs_2.txt", row.names=FALSE, col.names=FALSE)
-# 
-# sort(table(pairs[,1]))
+create_txt_file <- FALSE
+if (create_txt_file == TRUE){
+  pairs <- c("beer_1","beer_2", "difference")
+  beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300] # 59 beers
+  i <- 0
+  for (beer_1 in beers){ 
+    for (beer_2 in beers){
+      print(paste(paste(beer_1," vs "),beer_2))
+      if (beer_1 == beer_2){
+        #pass
+      }
+      else{
+        to_keep <- c(beer_1, beer_2) # relationship of interest
+        cur_data <- data[data$Style %in% to_keep,] # only keep beer_1 and beer_2
+        
+        cols <- c("OG","FG","ABV","IBU","Color","BoilSize","BoilTime","Efficiency")
+        res <- Mclust(cur_data[,cols], G=2) # cluster on all vars
+        
+        compare <- cbind(cur_data$Style, res$classification)
+        
+        # cluster 1 has x % of the totals for each beer
+        perc_beer_1 <- sum(compare[compare[,2] == 1,][,1] == beer_1)/sum(cur_data$Style == beer_1)
+        perc_beer_2 <- sum(compare[compare[,2] == 1,][,1] == beer_2)/sum(cur_data$Style == beer_2)
+        
+        # cluster 2 has x % of the totals for each beer (redundant since it will be 1-cluster 1)
+        #perc_beer_1 <- sum(compare[compare[,2] == 2,][,1] == beer_1)/sum(data$Style == beer_1)
+        #perc_beer_2 <- sum(compare[compare[,2] == 2,][,1] == beer_2)/sum(data$Style == beer_2)
+        
+        
+        #(perc_beer_1 > .9)&(perc_beer_2 < .1) | (perc_beer_2 > .9)&(perc_beer_1 < .1)
+        if ( abs(perc_beer_2 - perc_beer_1) > .85 ) {
+          pairs <- rbind(pairs, c(beer_1, beer_2, abs(perc_beer_2 - perc_beer_1)))
+        }
+        i <- i + 1
+        print(paste(paste("pair ", i), "of 3422"))
+        print(paste(100 - round((i/3422 * 100),0.2), "% remaining"))
+      }
+    }
+  }
+  
+  length(unique(pairs[,1]))
+  
+  # writes pairs to file
+  write.table(pairs, file="pairs_4.txt", row.names=FALSE, col.names=FALSE)
+  
+  sort(table(pairs[,1]))
+}
 #########################################################################################
 
 # subset data from highly distinct pairs
-# NOTE: HAVE THE "pairs_2.txt" FILE IN THE WORKING DIRECTORY
-pairs <- read.table("pairs_2.txt", header = T)
-length(unique(pairs$beer_1))  # 58 beers
-high_distinct_beers <- sort(table(pairs$beer_1)[table(pairs$beer_1) >= 30])
+# NOTE: HAVE THE "pairs_4.txt" FILE IN THE WORKING DIRECTORY
+pairs <- read.table("pairs_4.txt", header = T)
+length(unique(pairs$beer_1))  # 
+high_distinct_beers <- sort(table(pairs$beer_1)[table(pairs$beer_1) >= 5]) # keep only beers with 5 or more distinct relationships
 
-length(high_distinct_beers)  # narrowed to 13 highly distinct beers
+length(high_distinct_beers)  # narrowed to highly distinct beers
 high_distinct_beers <- names(high_distinct_beers) # labels for beers
 
 data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
@@ -179,41 +185,47 @@ row.names(data) <- NULL # reset row indices
 
 # count of each style in the data
 sort(table(data$Style), decreasing = TRUE) 
-################################### END OF SUBSETTING DATA TO DISTINCT BEERS ##################################################
+###################################### END BEER STYLE SELECTION ##############################################################
 
-################################################################ MODEL-BASED CLASSIFICATION ##################################################################
+###################################### CLASSIFICATION ##############################################################
 set.seed(8734)
 subset_data <- data # copy of data for this section
 
+l <- levels(factor(subset_data$Style)) # levels of beer (in words) for converting back
 
-labels_word <- subset_data$Style # true labels in words
-labels_factor <- as.numeric(factor(subset_data$Style)) # true labels as factor
+labels_factor <- as.numeric(factor(subset_data$Style)) # true labels as numeric
+true_labels <- labels_factor
 
-unique(labels_word)  #sanity check
+l  #sanity check
 unique(labels_factor)
 
 # test set (and train set)
 n <- dim(subset_data)[1]
-testSample <- sample(1:n,ceiling(.2*n))
+testSample <- sample(1:n,ceiling(.8*n))
 true_test <- labels_factor[testSample]
 labels_factor[testSample] <- 0    # artificially erase labels for test set
 
 # checking labels_factor var
 table(labels_factor)
-sum(labels_factor == 0)/length(labels_factor) # should be 20%
+sum(labels_factor == 0)/length(labels_factor) # should be 80%
 
 # MGHD
-res_MGHD <- MGHD(data= subset_data[,c("FG","Color", "ABV")], G= 13, label= labels_factor)
+res_MGHD <- MGHD(data= subset_data[,c("Color","ABV")], G= 6, label= labels_factor)
 
 predicted_labels <- res_MGHD@map
 predicted_test <- predicted_labels[testSample]
 
 sum(predicted_test == true_test)/length(testSample) # accuracy
 
+# plot
 
-############################################################## END MODEL-BASED CLASSIFICATION ##################################################################
+plot(subset_data[,c("ABV","Color")], col=predicted_test, main = "Predicted")
 
+plot(subset_data[,c("ABV","Color")], col=true_test, main = "True")
 
+# Confusion Matrix
+confusionMatrix(factor(predicted_test, labels = l), factor(true_test,labels = l))
 
+###################################### END CLASSIFICATION ##############################################################
 
 
