@@ -150,8 +150,8 @@ test=data[indicesTest,]
 #         pairs <- rbind(pairs, c(beer_1, beer_2, abs(perc_beer_2 - perc_beer_1)))
 #       }
 #       i <- i + 1
-#       print(paste(paste("pair ", i), "of 3481"))
-#       print(paste(100 - round((i/3481 * 100),0.2), "% remaining"))
+#       print(paste(paste("pair ", i), "of 3422"))
+#       print(paste(100 - round((i/3422 * 100),0.2), "% remaining"))
 #     }
 #   }
 # }
