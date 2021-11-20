@@ -3,7 +3,7 @@
 ### Approach 1 - FinalProject.R
 * Cleaning
 * LDA on full data
-* Subset to high distinct beers (using full_data LDA variables)
+* Subset to high distinct beers (using all columns)
 * Classification of subsetted data (using full_data LDA - recommended variables: "FG","OG")
 * Results: 40% accuracy, but hard to visualize
 
