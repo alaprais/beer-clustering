@@ -250,7 +250,7 @@ if (rand_class == TRUE){
 # choose (ngroup) random beers, look at predication accuracy with LDA1 LDA2
 accuracies <- c()
 for (i in 1:300){
-  ngroup <- 20
+  ngroup <- 6
   set.seed(NULL)
   high_distinct_beers <- sample(unique(data$Style), size=ngroup, replace=FALSE)
   class_data <- data[data$Style %in% high_distinct_beers,] # keep only high-distinct beers
