@@ -271,3 +271,48 @@ sum(predicted_test == true_test)/"add in denom" # accuracy
 
 
 ############################################################## END MODEL-BASED CLASSIFICATION ##################################################################
+
+
+
+
+
+
+
+
+
+#################################################################################################LDA on 6 styles
+#MOVE THIS SECTION LATER
+
+data <- read.csv("recipeData.csv")
+data <- data[,c(4, 7:13, 15)]
+data[data=="N/A"] = NA 
+round(colSums(is.na(data))/nrow(data), 3)
+data <- drop_na(data)
+data <- data[data$OG>1,]
+data <- data[data$OG<1.1,]
+data <- data[data$FG>.5,]
+data <- data[data$ABV>.5,]
+data <- data[data$IBU<500,]
+data <- data[data$Color<100,]
+beers <- c("Double IPA", "Foreign Extra Stout", "German Pilsner (Pils)", "Imperial Stout", "Russian Imperial Stout",  "Berliner Weisse")
+data6 <- data[data$Style %in% beers,]
+LDA6distinct = lda(data6$Style~., data6[,c(2:9)])
+LDA6distinct #Top 2 LDA variables account for 90.5% of variation
+data[,10]=0
+data[,11]=0
+colnames(data)[10]="LDA1Combination"
+colnames(data)[11]="LDA2Combination"
+
+for (i in 1:nrow(data)){
+  data6[i,10]=sum( ( (data6[i,c(2:9)])*as.matrix(as.numeric(LDA6distinct$scaling[,1])) ))
+  data6[i,11]= sum(( (data6[i,c(2:9)])*as.matrix(as.numeric(LDA6distinct$scaling[,2])) ))
+}
+
+
+ggplot(data6, aes(LDA1Combination,LDA2Combination)) + geom_point(aes(colour = Style), size = .5) 
+
+
+
+
+
+
