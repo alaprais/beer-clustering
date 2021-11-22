@@ -1,5 +1,10 @@
-# beer-clustering project outline
+# Files to turn in:
+* FinalProject_final.R
+* pairs_4.txt
+* random_beer_prediction.txt
 
+
+# beer-clustering project outline
 ### Approach 1 - FinalProject.R (DONE)
 * Cleaning
 * LDA on full data
