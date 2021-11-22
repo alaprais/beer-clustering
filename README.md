@@ -1,8 +1,8 @@
 # Files to turn in:
-* FinalProject_final.R
+* the code - FinalProject_final.R
+* the raw data - RecipeData.csv
 * pairs_4.txt
 * random_beer_prediction.txt
-* the raw data
 
 
 # beer-clustering project outline
