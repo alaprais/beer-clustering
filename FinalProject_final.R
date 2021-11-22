@@ -15,6 +15,7 @@ library(ggplot2)
 library(mclust)
 library(MixGHD)
 library(caret)
+library(ks)
 ##################################
 ###################################################### START DATA CLEANING ############################################
 data <- read.csv(personal_path)
@@ -238,18 +239,20 @@ predicted_test <- predicted_labels[testSample]
 sum(predicted_test == true_test)/length(testSample) # accuracy
 
 # plots
-#plot(class_data[,c("ABV","Color")], col=predicted_test, main = "Predicted")
-#plot(class_data[,c("ABV","Color")], col=true_test, main = "True")
+plot(class_data[,c("LDA1Combination","LDA2Combination")], col=predicted_test, main = "Predicted")
+plot(class_data[,c("LDA1Combination","LDA2Combination")], col=true_test, main = "True")
 
 # Confusion Matrix
-confusionMatrix(factor(predicted_test, labels = l), factor(true_test,labels = l))
+confus <- confusionMatrix(factor(predicted_test, labels = l), factor(true_test,labels = l))
+confus$table
 
 rand_class <- FALSE
 if (rand_class == TRUE){
 ############# RANDOM CLASSIFICATION ################
 # choose (ngroup) random beers, look at predication accuracy with LDA1 LDA2
 accuracies <- c()
-for (i in 1:300){
+combos <- matrix(data=NA, nrow=200, ncol=6)
+for (i in 1:200){
   ngroup <- 6
   set.seed(NULL)
   high_distinct_beers <- sample(unique(data$Style), size=ngroup, replace=FALSE)
@@ -282,9 +285,48 @@ for (i in 1:300){
   predicted_test <- predicted_labels[testSample]
 
   accuracies[i] <- sum(predicted_test == true_test)/length(testSample) # accuracy
+  combos[i,] <- high_distinct_beers
   print(i)
   print(accuracies[i])
 }
+
+outmat <- cbind(combos, accuracies)
+
+write.table(outmat, file="random_beer_prediction.txt", row.names=FALSE, col.names=FALSE)
 }
+
+rand_preds <- read.table(file="random_beer_prediction.txt")
+summary(rand_preds$V7) # distribution of simulated accuracies
+
+mean(rand_preds$V7) # sample avg pred accuracy
+var(rand_preds$V7) # sample var pred accuracy
+
+plot(kde(rand_preds$V7), lty = 1, xlab = "Prediction Accuracy", 
+     main = "Prediction Acc. Dist. for 200 6-Beer Subsets")
+abline(v=.75,col='red')
+legend(.23,3.3, legend=c("Distinct Beers"),
+       col=c("red"), lty=1, cex=0.8)
+
+########### best beers
+best <- rand_preds[which.max(rand_preds$V7),]
+best_data <- data[data$Style %in% best[-7],]
+row.names(best_data) <- NULL
+l <- levels(factor(best_data$Style)) # levels of beer (in words) for converting back
+labels_factor <- as.numeric(factor(best_data$Style)) # true labels as numeric
+true_labels <- labels_factor
+l  #sanity check
+unique(labels_factor)
+# test set (and train set)
+n <- dim(best_data)[1]
+testSample <- sample(1:n,ceiling(.8*n))
+true_test <- labels_factor[testSample]
+labels_factor[testSample] <- 0    # artificially erase labels for test set
+cols <- c("LDA1Combination", "LDA2Combination") # LDA vars
+res_MGHD <- MGHD(data= best_data[,cols], G= 6, label= labels_factor)
+predicted_labels <- res_MGHD@map  # maximum a posteriori estimates of labels
+predicted_test <- predicted_labels[testSample]
+confus2 <- confusionMatrix(factor(predicted_test, labels = l), factor(true_test,labels = l))
+confus2$table
+
 ###################################### END CLASSIFICATION ##############################################################
 
