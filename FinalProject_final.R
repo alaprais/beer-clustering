@@ -19,43 +19,26 @@ library(ks)
 ##################################
 ###################################################### START DATA CLEANING ############################################
 data <- read.csv(personal_path)
-
-
 # Keeping numeric/useful columns
 data <- data[,c(4, 7:13, 15)]
-
-
 #NAs are listed as "N/A" characters - convert to NA:
 data[data=="N/A"] = NA 
-
-
 # Percentage of NAs by column
 round(colSums(is.na(data))/nrow(data), 3)
 # There are just a few in Style so get rid of them
 data <- drop_na(data)
-
-
 # Water has a specific gravity of 1.000 and When grains for the wort are added, the density increases 
 # There should not be any beers with an original gravity of 1.000. 
 # High gravity beers have an OG of 1.075 so anything greater than 1.1 seems pretty unreasonable
 data <- data[data$OG>1,]
 data <- data[data$OG<1.1,]
-
-
 # FG can be less than one due to alcohol content - there's one listed with FG<0.5 that doesn't make sense so remove it:
 data <- data[data$FG>.5,]
-
-
-
 # Focus just on Alcoholic beers - remove all beers with ABV < 0.5
 data <- data[data$ABV>.5,]
-
-
 # IBU is kinda murky - almost all beers fall between 5 and 120, but can get up into the hundreds (and apparently a
 # couple in the thousands - but since these are homebrews not sure what's reasonable)
 data <- data[data$IBU<500,]
-
-
 # Color is generally between 0 - 40 but can get higher. Like IBU, not sure where we should draw the line (theres only 1 over 100 and it's
 # pretty suspect so removed it).
 data <- data[data$Color<100,]
@@ -64,7 +47,6 @@ beers <- names(sort(table(data$Style)))[sort(table(data$Style)) >= 300]  # keep 
 data <- data[data$Style %in% beers,]
 
 summary(data)
-
 #########################################  END DATA CLEANING ###############################################################
 lda_try <- TRUE
 if (lda_try == TRUE){
