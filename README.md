@@ -2,6 +2,7 @@
 * FinalProject_final.R
 * pairs_4.txt
 * random_beer_prediction.txt
+* the raw data
 
 
 # beer-clustering project outline
