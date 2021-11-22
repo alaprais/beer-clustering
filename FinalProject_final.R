@@ -326,7 +326,8 @@ res_MGHD <- MGHD(data= best_data[,cols], G= 6, label= labels_factor)
 predicted_labels <- res_MGHD@map  # maximum a posteriori estimates of labels
 predicted_test <- predicted_labels[testSample]
 confus2 <- confusionMatrix(factor(predicted_test, labels = l), factor(true_test,labels = l))
-confus2$table
+confus2
 
 ###################################### END CLASSIFICATION ##############################################################
+
 
