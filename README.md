@@ -1,8 +1,8 @@
 # File Overview:
 * the code - FinalProject_final.R
 * the raw data - RecipeData.csv
-* pairs_4.txt
-* random_beer_prediction.txt
+* high distinct pairs - pairs_4.txt
+* clustering evaluation - random_beer_prediction.txt
 
 
 # beer-clustering project outline
