@@ -1,4 +1,4 @@
-# Files to turn in:
+# File Overview:
 * the code - FinalProject_final.R
 * the raw data - RecipeData.csv
 * pairs_4.txt
